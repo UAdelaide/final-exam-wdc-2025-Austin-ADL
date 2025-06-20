@@ -184,14 +184,8 @@ async function login() {
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
-    if (res.ok) {
-      if (data.role === 'owner') {
-        window.location.href = '/owner-dashboard.html';
-      } else if (data.role === 'walker') {
-        window.location.href = '/walker-dashboard.html';
-      } else {
-        alert('未知用户类型');
-      }
+
+    
     } else {
       alert(data.message || '登录失败');
     }
