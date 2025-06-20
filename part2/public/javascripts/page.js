@@ -185,7 +185,21 @@ async function login() {
     });
     const data = await res.json();
 
-    
+    if (res.ok) {
+      // 注意：后端把 role 包在了 data.user.role
+      const role = data.user.role;
+      if (role === 'owner') {
+       window.location.href = '/owner-dashboard.html';
+      } else if (role === 'walker') {
+        window.location.href = '/walker-dashboard.html';
+      } else {
+        alert('未知用户类型');
+      }
+    } else {
+      // 后端返回的是 { error: 'Invalid credentials' }
++      alert(data.error || '登录失败');
++    }
+
     } else {
       alert(data.message || '登录失败');
     }
