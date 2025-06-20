@@ -28,6 +28,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// 获取当前用户信息 (新增)
 router.get('/me', (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ error: 'Not logged in' });
@@ -35,10 +36,9 @@ router.get('/me', (req, res) => {
   res.json(req.session.user);
 });
 
-// POST login (dummy version)
-// 修改登录路由
+// POST 登录 (修改)
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body; // 改为使用 username
+  const { username, password } = req.body;
 
   try {
     const [rows] = await db.query(`
@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
 
     const user = rows[0];
 
-    // 直接比较明文密码（根据要求）
+    // 直接比较明文密码 (根据要求)
     if (password !== user.password_hash) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -74,15 +74,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// 添加 me 路由
-router.get('/me', (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ error: 'Not logged in' });
-  }
-  res.json(req.session.user);
-});
-
-// 添加注销路由
+// POST 注销 (新增)
 router.post('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
@@ -91,4 +83,5 @@ router.post('/logout', (req, res) => {
     res.json({ message: 'Logout successful' });
   });
 });
+
 module.exports = router;
