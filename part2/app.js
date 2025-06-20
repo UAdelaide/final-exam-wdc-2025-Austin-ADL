@@ -7,6 +7,13 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+// ✅ 加入 session 中间件
+app.use(session({
+  secret: 'dogwalksecret', // 可替换为更强的密钥
+  resave: false,
+  saveUninitialized: false
+}));
+
 app.use(express.static(path.join(__dirname, '/public')));
 
 // Routes
