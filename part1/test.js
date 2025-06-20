@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 async function testConnection() {
   try {
     const connection = await mysql.createConnection({
-      host: '127.0.0.1',         // ← 使用这个 host
+      host: '127.0.0.1',
       user: 'root',
       password: 'mypassword',
       database: 'DogWalkService'
