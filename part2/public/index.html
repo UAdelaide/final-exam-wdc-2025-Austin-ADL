@@ -96,7 +96,124 @@
       });
     }
   </script>
+<!-- 在登录表单下方添加狗狗照片展示 -->
+<section class="dog-section mt-5">
+  <h2 class="text-center mb-4">Meet Our Lovely Dogs</h2>
 
+  <!-- 加载状态 -->
+  <div v-if="loadingDogs" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading dog photos...</p>
+  </div>
+
+  <!-- 狗狗照片网格 -->
+  <div v-else class="dog-photos">
+    <div v-for="dog in dogs" :key="dog.dog_id" class="dog-card">
+      <img :src="dog.imageUrl" :alt="dog.name" class="dog-image">
+      <div class="dog-name">{{ dog.name }}</div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // 在Vue实例中添加新功能
+  const { createApp } = Vue;
+
+  createApp({
+    data() {
+      return {
+        message: 'Welcome to the Dog Walking Service!',
+        loggedIn: false,
+        dogs: [], // 存储狗狗数据
+        loadingDogs: true // 加载状态
+      };
+    },
+    methods: {
+      // 获取狗狗信息和照片
+      async loadDogs() {
+        try {
+          // 从我们自己的API获取狗狗信息
+          const dogsRes = await fetch('/api/dogs');
+          if (!dogsRes.ok) throw new Error('Failed to fetch dogs');
+          this.dogs = await dogsRes.json();
+
+          // 为每只狗获取随机照片
+          const dogPhotoPromises = this.dogs.map(async dog => {
+            try {
+              const photoRes = await fetch('https://dog.ceo/api/breeds/image/random');
+              if (!photoRes.ok) throw new Error('Failed to fetch dog photo');
+              const photoData = await photoRes.json();
+              dog.imageUrl = photoData.message;
+            } catch (error) {
+              dog.imageUrl = 'https://images.dog.ceo/breeds/maltese/n02085936_10044.jpg'; // 默认图片
+            }
+          });
+
+          await Promise.all(dogPhotoPromises);
+        } catch (error) {
+          console.error('Error loading dogs:', error);
+        } finally {
+          this.loadingDogs = false;
+        }
+      }
+    },
+    mounted() {
+      this.loadDogs(); // 加载狗狗信息
+    }
+  }).mount('#app');
+</script>
+
+<style>
+  /* 狗狗照片展示样式 */
+  .dog-section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .dog-photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .dog-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+  }
+
+  .dog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  }
+
+  .dog-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .dog-name {
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+    background: #f8f9fa;
+  }
+
+  @media (max-width: 768px) {
+    .dog-photos {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+  }
+</style>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
