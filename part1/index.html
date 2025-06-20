@@ -6,17 +6,41 @@
   <title>Dog of the Day</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
-    body {
-      background-image: url('https://media.giphy.com/media/3o6ZsZZEF9BzJzTzSw/giphy.gif');
-      color: lime;
-      font-family: Comic Sans MS;
-      text-align: center;
-      padding: 50px;
-      animation: flash 0.3s infinite alternate; /* 提高闪烁频率 */
-      position: relative;
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
       overflow: hidden;
-      height: 100vh;
+      font-family: Comic Sans MS;
+      color: lime;
     }
+
+    .background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      animation: flash 0.3s infinite alternate;
+      z-index: 0;
+    }
+
+    .overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://media.giphy.com/media/3o6ZsZZEF9BzJzTzSw/giphy.gif');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3; /* 控制动图透明度，让频闪颜色透出 */
+      z-index: 1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 40px;
+    }
+
     @keyframes flash {
       0% { background-color: red; }
       25% { background-color: orange; }
@@ -24,10 +48,12 @@
       75% { background-color: orange; }
       100% { background-color: red; }
     }
+
     .dog-info {
       font-size: 24px;
       margin: 10px 0;
     }
+
     button {
       background: none;
       border: none;
@@ -35,10 +61,12 @@
       color: cyan;
       cursor: crosshair;
     }
+
     .dog-box {
       position: absolute;
       transition: all 0.5s ease;
     }
+
     .dog-box img {
       width: 200px;
       border: 5px dashed magenta;
@@ -46,7 +74,9 @@
   </style>
 </head>
 <body>
-  <div id="app">
+  <div class="background"></div>
+  <div class="overlay"></div>
+  <div id="app" class="content">
     <h1>🐶 D0G 0F TH3 D@Y 🐶</h1>
     <button @click="loadImage">??? L0AD R@ND0M D0G ???</button>
     <div v-for="(img, index) in dogImages" :key="index" class="dog-box"
