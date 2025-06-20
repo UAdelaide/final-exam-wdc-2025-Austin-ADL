@@ -174,28 +174,32 @@ function downvote(index) {
 }
 
 
-function login() {
-  let user = {
-    email: document.getElementById('username').value,
-    password: document.getElementById('password').value
-  };
+function login(){
 
-  var xmlhttp = new XMLHttpRequest();
+    let user = {
+        user: document.getElementById('username').value,
+        pass: document.getElementById('password').value
+    };
 
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      const result = JSON.parse(this.responseText);
-      window.location.href = result.redirect;
-    } else if (this.readyState == 4 && this.status >= 400) {
-      alert("Login failed");
-    }
-  };
+    // Create AJAX Request
+    var xmlhttp = new XMLHttpRequest();
 
-  xmlhttp.open("POST", "/users/login", true);
-  xmlhttp.setRequestHeader("Content-type", "application/json");
-  xmlhttp.send(JSON.stringify(user));
+    // Define function to run on response
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            alert("Welcome "+this.responseText);
+        } else if (this.readyState == 4 && this.status >= 400) {
+            alert("Login failed");
+        }
+    };
+
+    // Open connection to server & send the post data using a POST request
+    // We will cover POST requests in more detail in week 8
+    xmlhttp.open("POST", "/users/login", true);
+    xmlhttp.setRequestHeader("Content-type", "application/json");
+    xmlhttp.send(JSON.stringify(user));
+
 }
-
 
 function logout(){
 
