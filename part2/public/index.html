@@ -32,6 +32,9 @@
   </form>
 </div>
 <div id="loginMessage" class="alert alert-danger d-none"></div>
+<div id="app" class="container py-5" v-if="loggedIn">
+  <!-- 原有内容保持不变 -->
+</div>
   <script>
     const { createApp } = Vue;
     createApp({
