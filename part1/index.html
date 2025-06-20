@@ -7,15 +7,12 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
     body {
-      background-image: url('https://media.giphy.com/media/3o6ZsZZEF9BzJzTzSw/giphy.gif');
+      background-image: url('https://media.giphy.com/media/3o6ZsZZEF9BzJzTzSw/giphy.gif'); /* 动态背景违反认知负担 */
       color: lime;
       font-family: Comic Sans MS;
       text-align: center;
       padding: 50px;
-      animation: flash 0.8s infinite alternate;
-      position: relative;
-      overflow: hidden;
-      height: 100vh;
+      animation: flash 0.8s infinite alternate; /* 闪烁背景提高认知负担 */
     }
     @keyframes flash {
       0% { background-color: red; }
@@ -23,22 +20,14 @@
     }
     .dog-info {
       font-size: 24px;
-      margin: 10px 0;
+      margin: 20px;
     }
     button {
       background: none;
       border: none;
       font-size: 30px;
       color: cyan;
-      cursor: crosshair;
-    }
-    .dog-box {
-      position: absolute;
-      transition: all 0.5s ease;
-    }
-    .dog-box img {
-      width: 200px;
-      border: 5px dashed magenta;
+      cursor: crosshair; /* 奇怪的鼠标图标增加操作负担 */
     }
   </style>
 </head>
@@ -46,9 +35,8 @@
   <div id="app">
     <h1>🐶 D0G 0F TH3 D@Y 🐶</h1>
     <button @click="loadImage">??? L0AD R@ND0M D0G ???</button>
-    <div v-for="(img, index) in dogImages" :key="index" class="dog-box"
-         :style="{ top: randomPosition(index).top, left: randomPosition(index).left, zIndex: 999 - index }">
-      <img :src="img">
+    <div v-if="dogImage">
+      <img :src="dogImage" width="400"> <!-- 无 alt 属性，违反可访问性 -->
       <div class="dog-info">N@ME: F!D0<br>BR33D: ???</div>
     </div>
   </div>
@@ -58,7 +46,7 @@
     createApp({
       data() {
         return {
-          dogImages: [],
+          dogImage: null
         }
       },
       methods: {
@@ -66,15 +54,10 @@
           try {
             const res = await fetch('https://dog.ceo/api/breeds/image/random');
             const data = await res.json();
-            this.dogImages.push(data.message);
+            this.dogImage = data.message;
           } catch (err) {
             alert('Error loading image');
           }
-        },
-        randomPosition(index) {
-          const top = Math.floor(Math.random() * (window.innerHeight - 220)) + 'px';
-          const left = Math.floor(Math.random() * (window.innerWidth - 220)) + 'px';
-          return { top, left };
         }
       }
     }).mount('#app');
