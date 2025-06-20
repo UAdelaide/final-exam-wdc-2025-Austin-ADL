@@ -49,18 +49,23 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    res.json({ message: 'Login successful', user: rows[0] });
+    const user = rows[0];
+
+    // 保存 session
+    req.session.user = {
+      user_id: user.user_id,
+      username: user.username,
+      role: user.role
+    };
+
+    // 根据角色返回 dashboard 地址
+    let redirectUrl = user.role === 'owner' ? '/owner-dashboard.html' : '/walker-dashboard.html';
+    res.json({ message: 'Login successful', redirect: redirectUrl });
+
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
   }
 });
-//test
-router.get('/test-session', (req, res) => {
-  if (req.session.user) {
-    res.json({ message: 'Session exists', user: req.session.user });
-  } else {
-    res.json({ message: 'No session found' });
-  }
-});
+
 
 module.exports = router;
