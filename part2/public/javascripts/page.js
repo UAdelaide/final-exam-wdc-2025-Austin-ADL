@@ -174,34 +174,31 @@ function downvote(index) {
 }
 
 
-function login() {
-  const credentials = {
-    email: document.getElementById('email').value,
-    password: document.getElementById('password').value
-  };
-
-  fetch('/api/users/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials)
-  })
-  .then(res => {
-    if (!res.ok) throw new Error('Login failed');
-    return res.json();
-  })
-  .then(data => {
-    const role = data.user.role;
-    if (role === 'owner') {
-      window.location.href = 'owner-dashboard.html';
-    } else if (role === 'walker') {
-      window.location.href = 'walker-dashboard.html';
+async function login() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  try {
+    const res = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      if (data.role === 'owner') {
+        window.location.href = '/owner-dashboard.html';
+      } else if (data.role === 'walker') {
+        window.location.href = '/walker-dashboard.html';
+      } else {
+        alert('未知用户类型');
+      }
     } else {
-      alert('Unknown role');
+      alert(data.message || '登录失败');
     }
-  })
-  .catch(err => {
-    alert('Login failed: ' + err.message);
-  });
+  } catch (err) {
+    console.error(err);
+    alert('网络错误，请稍后重试');
+  }
 }
 
 
