@@ -23,7 +23,9 @@ const userRoutes = require('./routes/userRoutes');
 
 app.use('/api/walks', walkRoutes);
 app.use('/api/users', userRoutes);
-
+// 在现有路由之后添加狗狗路由
+const dogRoutes = require('./routes/dogRoutes');
+app.use('/api/dogs', dogRoutes);
 // 仪表板路由 (新增)
 app.get('/owner-dashboard', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'owner') {
