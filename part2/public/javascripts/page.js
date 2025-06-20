@@ -186,11 +186,20 @@ function login(){
 
     // Define function to run on response
     xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            alert("Welcome "+this.responseText);
-        } else if (this.readyState == 4 && this.status >= 400) {
-            alert("Login failed");
+        if (this.readyState === 4) {
+        if (this.status === 200) {
+          const res = JSON.parse(this.responseText);
+          const user = res.user;
+          // 根据角色跳转
+          if (user.role === 'owner') {
+            window.location.href = '/owner-dashboard.html';
+          } else {
+            window.location.href = '/walker-dashboard.html';
+          }
+        } else {
+          alert('Login failed');
         }
+      }
     };
 
     // Open connection to server & send the post data using a POST request
