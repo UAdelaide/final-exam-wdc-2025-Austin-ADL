@@ -22,6 +22,23 @@ const userRoutes = require('./routes/userRoutes');
 
 app.use('/api/walks', walkRoutes);
 app.use('/api/users', userRoutes);
+app.get('/owner-dashboard', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'owner') {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'public/owner-dashboard.html'));
+});
 
+app.get('/walker-dashboard', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'walker') {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'public/walker-dashboard.html'));
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+});
 // Export the app instead of listening here
 module.exports = app;
