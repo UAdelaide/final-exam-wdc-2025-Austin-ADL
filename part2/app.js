@@ -1,3 +1,4 @@
+const session = require('express-session'); // 添加这行
 const express = require('express');
 const path = require('path');
 require('dotenv').config();
