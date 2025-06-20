@@ -12,20 +12,11 @@
   <div id="app" class="container py-5">
     <h1 class="mb-4 text-primary">{{ message }}</h1>
     <p class="lead">Connect with trusted walkers for your beloved dog!</p>
-   <form onsubmit="login(); return false;">
-     <div class="mb-3">
-       <label for="email" class="form-label">Email</label>
-        <input id="email" type="email" class="form-control" placeholder="alice@example.com" required>
-     </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input id="password" type="password" class="form-control" required>
-     </div>
-      <button type="submit" class="btn btn-primary">Log In</button>
-    </form>
+
+    <a href="owner-dashboard.html" class="btn btn-outline-primary me-2">Owner Dashboard</a>
+    <a href="walker-dashboard.html" class="btn btn-outline-success">Walker Dashboard</a>
   </div>
 
-  <script src="/javascripts/page.js"></script>
   <script>
     const { createApp } = Vue;
     createApp({
