@@ -54,5 +54,13 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Login failed' });
   }
 });
+//test
+router.get('/test-session', (req, res) => {
+  if (req.session.user) {
+    res.json({ message: 'Session exists', user: req.session.user });
+  } else {
+    res.json({ message: 'No session found' });
+  }
+});
 
 module.exports = router;
