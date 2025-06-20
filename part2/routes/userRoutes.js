@@ -36,11 +36,15 @@ router.get('/me', (req, res) => {
 });
 
 // POST login
+// routes/userRoutes.js（只贴 /login 部分，前后不用动）
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
+  // —— 可选：调试用，打印客户端发来的内容
+  console.log('Login attempt:', req.body);
+
   try {
-    // 1. 只用 email 查出用户及其 password_hash
+    // 1. 只按 email 查出这条用户记录（含 password_hash）
     const [rows] = await db.query(
       `SELECT user_id, username, role, password_hash
          FROM Users
@@ -48,23 +52,25 @@ router.post('/login', async (req, res) => {
       [email]
     );
 
-    // 2. 如果没查到，或密码不匹配，则返回 401
+    // —— 可选：调试用，打印数据库查到的结果
+    console.log('DB returned:', rows);
+
+    // 2. 如果没查到，或密码不对，就登录失败
     if (rows.length === 0 || rows[0].password_hash !== password) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // 3. 登陆成功：组装 user 对象，写入 session，返回结果
+    // 3. 登录成功，剔除 hash，写入 session，再返回给前端
     const user = {
       user_id: rows[0].user_id,
       username: rows[0].username,
       role: rows[0].role
     };
     req.session.user = user;
-
     res.json({ message: 'Login successful', user });
 
-  } catch (error) {
-    console.error('Login error:', error);
+  } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ error: 'Login failed' });
   }
 });
