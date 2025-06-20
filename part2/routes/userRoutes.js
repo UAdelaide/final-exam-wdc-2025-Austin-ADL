@@ -36,23 +36,59 @@ router.get('/me', (req, res) => {
 });
 
 // POST login (dummy version)
+// 修改登录路由
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body; // 改为使用 username
 
   try {
     const [rows] = await db.query(`
-      SELECT user_id, username, role FROM Users
-      WHERE email = ? AND password_hash = ?
-    `, [email, password]);
+      SELECT user_id, username, password_hash, role
+      FROM Users
+      WHERE username = ?
+    `, [username]);
 
     if (rows.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    res.json({ message: 'Login successful', user: rows[0] });
+    const user = rows[0];
+
+    // 直接比较明文密码（根据要求）
+    if (password !== user.password_hash) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // 设置 session
+    req.session.user = {
+      user_id: user.user_id,
+      username: user.username,
+      role: user.role
+    };
+
+    res.json({
+      message: 'Login successful',
+      role: user.role
+    });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
   }
 });
 
+// 添加 me 路由
+router.get('/me', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+  res.json(req.session.user);
+});
+
+// 添加注销路由
+router.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ error: 'Logout failed' });
+    }
+    res.json({ message: 'Logout successful' });
+  });
+});
 module.exports = router;
