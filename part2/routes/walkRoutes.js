@@ -58,5 +58,27 @@ router.post('/:id/apply', async (req, res) => {
     res.status(500).json({ error: 'Failed to apply for walk' });
   }
 });
+// 新增获取业主狗列表端点
+router.get('/dogs', async (req, res) => {
+  // 检查用户是否登录且是业主
+  if (!req.session.user || req.session.user.role !== 'owner') {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
 
+  const ownerId = req.session.user.user_id;
+
+  try {
+    // 查询该业主的所有狗
+    const [rows] = await db.query(`
+      SELECT dog_id, name, size
+      FROM Dogs
+      WHERE owner_id = ?
+    `, [ownerId]);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching dogs:', error);
+    res.status(500).json({ error: 'Failed to fetch dogs' });
+  }
+});
 module.exports = router;
