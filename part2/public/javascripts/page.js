@@ -176,9 +176,9 @@ function downvote(index) {
 
 function login(){
 
-    const credentials = {
-      username: document.getElementById('username').value,
-      password: document.getElementById('password').value
+    let user = {
+        user: document.getElementById('username').value,
+        pass: document.getElementById('password').value
     };
 
     // Create AJAX Request
@@ -186,27 +186,18 @@ function login(){
 
     // Define function to run on response
     xmlhttp.onreadystatechange = function() {
-        if (this.readyState === 4) {
-        if (this.status === 200) {
-          const res = JSON.parse(this.responseText);
-          const user = res.user;
-          // 根据角色跳转
-          if (user.role === 'owner') {
-            window.location.href = '/owner-dashboard.html';
-          } else {
-            window.location.href = '/walker-dashboard.html';
-          }
-        } else {
-          alert('Login failed');
+        if (this.readyState == 4 && this.status == 200) {
+            alert("Welcome "+this.responseText);
+        } else if (this.readyState == 4 && this.status >= 400) {
+            alert("Login failed");
         }
-      }
     };
 
     // Open connection to server & send the post data using a POST request
     // We will cover POST requests in more detail in week 8
-    xmlhttp.open("POST", "/api/users/login", true);
+    xmlhttp.open("POST", "/users/login", true);
     xmlhttp.setRequestHeader("Content-type", "application/json");
-    xmlhttp.send(JSON.stringify(credentials));
+    xmlhttp.send(JSON.stringify(user));
 
 }
 
