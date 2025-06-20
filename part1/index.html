@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dog of the Day</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      background-image: url('https://media.giphy.com/media/3o6ZsZZEF9BzJzTzSw/giphy.gif'); /* 动态背景违反认知负担 */
+      color: lime;
+      font-family: Comic Sans MS;
+      text-align: center;
+      padding: 50px;
+      animation: flash 0.8s infinite alternate; /* 闪烁背景提高认知负担 */
+    }
+    @keyframes flash {
+      0% { background-color: red; }
+      100% { background-color: yellow; }
+    }
+    .dog-info {
+      font-size: 24px;
+      margin: 20px;
+    }
+    button {
+      background: none;
+      border: none;
+      font-size: 30px;
+      color: cyan;
+      cursor: crosshair; /* 奇怪的鼠标图标增加操作负担 */
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>🐶 D0G 0F TH3 D@Y 🐶</h1>
+    <button @click="loadImage">??? L0AD R@ND0M D0G ???</button>
+    <div v-if="dogImage">
+      <img :src="dogImage" width="400"> <!-- 无 alt 属性，违反可访问性 -->
+      <div class="dog-info">N@ME: F!D0<br>BR33D: ???</div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          dogImage: null
+        }
+      },
+      methods: {
+        async loadImage() {
+          try {
+            const res = await fetch('https://dog.ceo/api/breeds/image/random');
+            const data = await res.json();
+            this.dogImage = data.message;
+          } catch (err) {
+            alert('Error loading image');
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
