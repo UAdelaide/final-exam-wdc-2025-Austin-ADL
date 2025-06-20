@@ -6,39 +6,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      margin-bottom: 20px;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+    .card-header {
+      border-top-left-radius: 10px !important;
+      border-top-right-radius: 10px !important;
+      font-weight: bold;
+    }
+    .btn-apply {
+      transition: all 0.3s;
+    }
+    .btn-apply:hover {
+      transform: scale(1.05);
+    }
+    .welcome-badge {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body class="bg-light">
   <div id="app" class="container py-4">
-    <!-- 登出按钮 (新增) -->
-    <div class="d-flex justify-content-end mb-4">
+    <!-- 登出按钮和欢迎信息 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="text-success mb-0">Walker Dashboard</h1>
+        <span v-if="user" class="badge welcome-badge fs-6">
+          Welcome, {{ user.username }}!
+        </span>
+      </div>
       <button @click="logout" class="btn btn-outline-secondary">Log Out</button>
     </div>
 
-    <h1 class="mb-4 text-success">Walker Dashboard</h1>
+    <!-- 消息显示 -->
+    <div v-if="message" class="alert alert-success alert-dismissible fade show">
+      <strong>Success!</strong> {{ message }}
+      <button type="button" class="btn-close" @click="message = ''"></button>
+    </div>
+    <div v-if="error" class="alert alert-danger alert-dismissible fade show">
+      <strong>Error!</strong> {{ error }}
+      <button type="button" class="btn-close" @click="error = ''"></button>
+    </div>
 
-    <!-- Alert messages -->
-    <div v-if="message" class="alert alert-info">{{ message }}</div>
-    <div v-if="error" class="alert alert-danger">{{ error }}</div>
+    <!-- 可用的遛狗请求 -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="mb-0">Available Walk Requests</h2>
+      <button class="btn btn-sm btn-outline-success" @click="loadWalkRequests">
+        <i class="bi bi-arrow-repeat"></i> Refresh
+      </button>
+    </div>
 
-    <!-- Walk requests list -->
-    <div v-if="walks.length > 0" class="row">
-      <div class="col-md-6 mb-4" v-for="walk in walks" :key="walk.request_id">
-        <div class="card">
+    <div v-if="walks.length === 0" class="card">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+        <h5 class="mt-3">No available walks</h5>
+        <p class="text-muted">Check back later for new walk requests</p>
+      </div>
+    </div>
+
+    <div class="row" v-else>
+      <div class="col-md-6 col-lg-4 mb-4" v-for="walk in walks" :key="walk.request_id">
+        <div class="card h-100">
           <div class="card-body">
-            <h5 class="card-title">Walk for {{ walk.dog_name }} ({{ walk.size }})</h5>
-            <p class="card-text">
-              <strong>Date:</strong> {{ new Date(walk.requested_time).toLocaleString() }}<br>
-              <strong>Duration:</strong> {{ walk.duration_minutes }} minutes<br>
-              <strong>Location:</strong> {{ walk.location }}<br>
-              <strong>Owner:</strong> {{ walk.owner_name }}
-            </p>
-            <button type=button class="btn btn-outline-success" @click="applyToWalk(walk.request_id)">Apply</button>
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h5 class="card-title mb-0">#{{ walk.request_id }}</h5>
+              <span class="badge bg-info">
+                {{ walk.duration_minutes }} min
+              </span>
+            </div>
+
+            <div class="d-flex mb-3">
+              <div class="me-3">
+                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center"
+                     style="width: 50px; height: 50px;">
+                  <i class="bi bi-dog text-primary"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ walk.dog_name }}</h6>
+                <p class="text-muted mb-0">{{ walk.size }} · {{ walk.owner_name }}</p>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <p class="mb-1"><i class="bi bi-calendar me-2"></i>
+                {{ new Date(walk.requested_time).toLocaleDateString() }}
+              </p>
+              <p class="mb-1"><i class="bi bi-clock me-2"></i>
+                {{ new Date(walk.requested_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}
+              </p>
+              <p class="mb-0"><i class="bi bi-geo-alt me-2"></i> {{ walk.location }}</p>
+            </div>
+
+            <button
+              class="btn btn-success w-100 btn-apply"
+              @click="applyToWalk(walk.request_id)">
+              <i class="bi bi-check-circle me-2"></i>Apply for Walk
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <p v-else>No available walk requests at the moment.</p>
   </div>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
   <script>
     const { createApp, ref, onMounted } = Vue;
@@ -48,24 +130,51 @@
         const walks = ref([]);
         const message = ref('');
         const error = ref('');
-        const user = ref(null); // 新增用户状态
+        const user = ref(null); // 存储当前用户信息
 
-        // 检查登录状态 (新增)
-        async function checkLogin() {
+        // 获取当前登录用户
+        async function getCurrentUser() {
           try {
             const res = await fetch('/api/users/me');
-            if (!res.ok) throw new Error('Not logged in');
-
-            const data = await res.json();
-            if (data.role !== 'walker') {
-              window.location.href = '/';
-            }
-            user.value = data;
-          } catch (error) {
-            window.location.href = '/';
+            if (!res.ok) throw new Error('Failed to get user info');
+            user.value = await res.json();
+          } catch (err) {
+            console.error('Error getting current user:', err);
+            error.value = 'Failed to get user information';
           }
         }
 
+        // 申请遛狗
+        async function applyToWalk(requestId) {
+          try {
+            // 确保已获取当前用户信息
+            if (!user.value) {
+              await getCurrentUser();
+            }
+
+            // 使用当前用户ID
+            const walkerId = user.value.user_id;
+
+            const res = await fetch(`/api/walks/${requestId}/apply`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ walker_id: walkerId }) // 使用当前用户ID
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) throw new Error(result.error || 'Application failed');
+
+            message.value = result.message || 'Walk application submitted successfully!';
+            error.value = '';
+            await loadWalkRequests();
+          } catch (err) {
+            error.value = err.message;
+            message.value = '';
+          }
+        }
+
+        // 加载遛狗请求
         async function loadWalkRequests() {
           try {
             const res = await fetch('/api/walks');
@@ -76,27 +185,23 @@
           }
         }
 
-        async function applyToWalk(requestId) {
+        // 检查登录状态
+        async function checkLogin() {
           try {
-            // 使用当前登录用户ID (修改)
-            const res = await fetch(`/api/walks/${requestId}/apply`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ walker_id: user.value.user_id })
-            });
-            const result = await res.json();
+            const res = await fetch('/api/users/me');
+            if (!res.ok) throw new Error('Not logged in');
 
-            if (!res.ok) throw new Error(result.error || 'Application failed');
-            message.value = result.message;
-            error.value = '';
-            await loadWalkRequests();
-          } catch (err) {
-            error.value = err.message;
-            message.value = '';
+            const data = await res.json();
+            if (data.role !== 'walker') {
+              window.location.href = '/';
+            }
+            user.value = data; // 存储用户数据
+          } catch (error) {
+            window.location.href = '/';
           }
         }
 
-        // 登出功能 (新增)
+        // 登出功能
         function logout() {
           fetch('/api/users/logout', {
             method: 'POST'
@@ -110,16 +215,18 @@
         }
 
         onMounted(() => {
-          checkLogin(); // 新增登录检查
+          checkLogin(); // 获取并存储当前用户信息
           loadWalkRequests();
         });
 
         return {
           walks,
+          user,
           message,
           error,
           applyToWalk,
-          logout // 暴露登出方法
+          loadWalkRequests,
+          logout
         };
       }
     }).mount('#app');
