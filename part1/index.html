@@ -1,89 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Dog of the Day</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
+      height: 100vh;
       overflow: hidden;
-      font-family: Comic Sans MS;
-      color: lime;
+      position: relative;
+      animation: backgroundFlash 0.3s infinite alternate;
     }
 
-    .background {
+    @keyframes backgroundFlash {
+      0% { background-color: red; }
+      50% { background-color: orange; }
+      100% { background-color: yellow; }
+    }
+
+    #app {
+      position: relative;
+    }
+
+    .dog-image {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      animation: flash 0.3s infinite alternate;
-      z-index: 0;
+      width: 200px;
+      height: auto;
+      z-index: 2;
     }
 
     .overlay {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-image: url('https://media.giphy.com/media/3o6ZsZZEF9BzJzTzSw/giphy.gif');
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url('https://media.tenor.com/9EuXEVnU4tEAAAAC/dog-dancing.gif');
       background-size: cover;
-      background-position: center;
-      opacity: 0.3; /* 控制动图透明度，让频闪颜色透出 */
+      opacity: 0.3;
       z-index: 1;
+      pointer-events: none;
     }
 
-    .content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      padding: 40px;
-    }
-
-    @keyframes flash {
-      0% { background-color: red; }
-      25% { background-color: orange; }
-      50% { background-color: yellow; }
-      75% { background-color: orange; }
-      100% { background-color: red; }
-    }
-
-    .dog-info {
-      font-size: 24px;
-      margin: 10px 0;
-    }
-
-    button {
-      background: none;
-      border: none;
-      font-size: 30px;
-      color: cyan;
-      cursor: crosshair;
-    }
-
-    .dog-box {
+    .title, .load-btn {
       position: absolute;
-      transition: all 0.5s ease;
+      left: 50%;
+      transform: translateX(-50%) rotate(-7deg);
+      font-family: 'Comic Sans MS', cursive;
+      font-weight: bold;
+      z-index: 3;
     }
 
-    .dog-box img {
-      width: 200px;
-      border: 5px dashed magenta;
+    .title {
+      top: 20px;
+      font-size: 36px;
+      color: lime;
+      text-shadow: 1px 1px 0 black;
+    }
+
+    .load-btn {
+      top: 90vh;
+      font-size: 28px;
+      color: cyan;
+      text-shadow: 2px 2px 0 purple;
     }
   </style>
 </head>
 <body>
-  <div class="background"></div>
   <div class="overlay"></div>
-  <div id="app" class="content">
-    <h1>🐶 D0G 0F TH3 D@Y 🐶</h1>
-    <button @click="loadImage">??? L0AD R@ND0M D0G ???</button>
-    <div v-for="(img, index) in dogImages" :key="index" class="dog-box"
-         :style="{ top: randomPosition(index).top, left: randomPosition(index).left, zIndex: 999 - index }">
-      <img :src="img">
-      <div class="dog-info">N@ME: F!D0<br>BR33D: ???</div>
-    </div>
+  <div id="app">
+    <div class="title">🐶 D0G 0F TH3 D@Y 🐶</div>
+    <div class="load-btn">??? L0AD R@ND0M D0G ???</div>
+    <img v-for="(dog, index) in dogs" :src="dog" class="dog-image" :style="getStyle(index)" />
   </div>
 
   <script>
@@ -91,23 +80,30 @@
     createApp({
       data() {
         return {
-          dogImages: [],
-        }
+          dogs: []
+        };
+      },
+      mounted() {
+        this.loadDogs();
       },
       methods: {
-        async loadImage() {
-          try {
-            const res = await fetch('https://dog.ceo/api/breeds/image/random');
-            const data = await res.json();
-            this.dogImages.push(data.message);
-          } catch (err) {
-            alert('Error loading image');
+        async loadDogs() {
+          for (let i = 0; i < 20; i++) {
+            try {
+              const res = await fetch('https://dog.ceo/api/breeds/image/random');
+              const data = await res.json();
+              this.dogs.push(data.message);
+            } catch (err) {
+              console.error('Load failed', err);
+            }
           }
         },
-        randomPosition(index) {
-          const top = Math.floor(Math.random() * (window.innerHeight - 220)) + 'px';
-          const left = Math.floor(Math.random() * (window.innerWidth - 220)) + 'px';
-          return { top, left };
+        getStyle(index) {
+          return {
+            top: Math.random() * 80 + 'vh',
+            left: Math.random() * 90 + 'vw',
+            transform: `rotate(${Math.random() * 360}deg)`
+          };
         }
       }
     }).mount('#app');
