@@ -35,33 +35,39 @@ router.get('/me', (req, res) => {
   res.json(req.session.user);
 });
 
-// POST login (dummy version)
+// POST login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const [rows] = await db.query(`
-      SELECT user_id, username, role, password_hash FROM Users
-      WHERE email = ?
-    `, [email]);
+    // 1. 只用 email 查出用户及其 password_hash
+    const [rows] = await db.query(
+      `SELECT user_id, username, role, password_hash
+         FROM Users
+        WHERE email = ?`,
+      [email]
+    );
 
+    // 2. 如果没查到，或密码不匹配，则返回 401
     if (rows.length === 0 || rows[0].password_hash !== password) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // 3. 登陆成功：组装 user 对象，写入 session，返回结果
     const user = {
       user_id: rows[0].user_id,
       username: rows[0].username,
       role: rows[0].role
     };
-
     req.session.user = user;
+
     res.json({ message: 'Login successful', user });
+
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });
   }
 });
-
 
 
 
