@@ -3,41 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dog of the Day</title>
+  <title>D0G 🐶 D@Y</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
     body {
-      background-image: url('https://media.giphy.com/media/3o6ZsZZEF9BzJzTzSw/giphy.gif'); /* 动态背景违反认知负担 */
-      color: lime;
-      font-family: Comic Sans MS;
-      text-align: center;
+      background-image: url('https://media.giphy.com/media/l0MYu5Gbb0dB1Z9rG/giphy.gif');
+      background-size: cover;
+      font-family: 'Papyrus', cursive;
+      font-size: 20px;
+      color: #ff00ff;
+      animation: colorRotate 1s infinite;
+      margin: 0;
+      padding: 0;
+      overflow-x: scroll; /* 造成横向滚动，增加混乱 */
+    }
+
+    @keyframes colorRotate {
+      0% { background-color: blue; }
+      25% { background-color: green; }
+      50% { background-color: orange; }
+      75% { background-color: pink; }
+      100% { background-color: blue; }
+    }
+
+    .container {
+      width: 200vw; /* 故意设置超宽内容，造成混乱视觉结构 */
       padding: 50px;
-      animation: flash 0.8s infinite alternate; /* 闪烁背景提高认知负担 */
     }
-    @keyframes flash {
-      0% { background-color: red; }
-      100% { background-color: yellow; }
+
+    h1 {
+      font-size: 50px;
+      text-shadow: 3px 3px 3px red;
+      letter-spacing: 8px;
+      transform: rotate(-5deg);
+      background: linear-gradient(to right, yellow, red);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .dog-info {
-      font-size: 24px;
-      margin: 20px;
-    }
+
     button {
-      background: none;
-      border: none;
-      font-size: 30px;
-      color: cyan;
-      cursor: crosshair; /* 奇怪的鼠标图标增加操作负担 */
+      font-size: 32px;
+      background-color: #000;
+      color: lime;
+      border: 5px dotted magenta;
+      padding: 20px;
+      transform: skewX(20deg);
+      cursor: zoom-in; /* 迷惑性光标 */
+      margin-top: 20px;
+    }
+
+    .dog-info {
+      font-size: 28px;
+      border: 3px dashed cyan;
+      background: repeating-linear-gradient(45deg, transparent, transparent 10px, lime 10px, lime 20px);
+      margin-top: 40px;
+      padding: 20px;
+      width: fit-content;
+      transform: scale(1.1) rotate(2deg);
+      box-shadow: 10px 10px 15px black;
+    }
+
+    img {
+      border: 10px solid red;
+      box-shadow: 0 0 40px yellow;
+      animation: spin 2s infinite linear;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
   <div id="app">
-    <h1>🐶 D0G 0F TH3 D@Y 🐶</h1>
-    <button @click="loadImage">??? L0AD R@ND0M D0G ???</button>
-    <div v-if="dogImage">
-      <img :src="dogImage" width="400"> <!-- 无 alt 属性，违反可访问性 -->
-      <div class="dog-info">N@ME: F!D0<br>BR33D: ???</div>
+    <div class="container">
+      <h1>🌟🌪️ D0G 0F TH3 D@Y 🌪️🌟</h1>
+      <button @click="loadImage">🐾 L0AD R@ND0M D0G N0W 🐾</button>
+      <div v-if="dogImage">
+        <img :src="dogImage" width="400">
+        <div class="dog-info">
+          N@ME: $Up3rF!D0<br>
+          Br33d: ∞ UNKN0WN
+        </div>
+      </div>
     </div>
   </div>
 
@@ -56,7 +105,7 @@
             const data = await res.json();
             this.dogImage = data.message;
           } catch (err) {
-            alert('Error loading image');
+            alert('💥 ERROR: C0U1D N0T L0AD D0G 💥');
           }
         }
       }
