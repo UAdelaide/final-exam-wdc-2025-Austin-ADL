@@ -62,7 +62,6 @@
   </script>
 
   <script>
-    // 登录表单处理 (新增)
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const username = document.getElementById('username').value;
@@ -82,7 +81,6 @@
         return response.json();
       })
       .then(data => {
-        // 根据角色重定向
         if (data.role === 'owner') {
           window.location.href = '/owner-dashboard';
         } else if (data.role === 'walker') {
@@ -96,11 +94,9 @@
       });
     }
   </script>
-<!-- 在登录表单下方添加狗狗照片展示 -->
 <section class="dog-section mt-5">
   <h2 class="text-center mb-4">Meet Our Lovely Dogs</h2>
 
-  <!-- 加载状态 -->
   <div v-if="loadingDogs" class="text-center my-5">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
@@ -108,7 +104,6 @@
     <p class="mt-2">Loading dog photos...</p>
   </div>
 
-  <!-- 狗狗照片网格 -->
   <div v-else class="dog-photos">
     <div v-for="dog in dogs" :key="dog.dog_id" class="dog-card">
       <img :src="dog.imageUrl" :alt="dog.name" class="dog-image">
@@ -118,7 +113,6 @@
 </section>
 
 <script>
-  // 在Vue实例中添加新功能
   const { createApp } = Vue;
 
   createApp({
@@ -126,20 +120,17 @@
       return {
         message: 'Welcome to the Dog Walking Service!',
         loggedIn: false,
-        dogs: [], // 存储狗狗数据
-        loadingDogs: true // 加载状态
+        dogs: [],
+        loadingDogs: true
       };
     },
     methods: {
-      // 获取狗狗信息和照片
       async loadDogs() {
         try {
-          // 从我们自己的API获取狗狗信息
           const dogsRes = await fetch('/api/dogs');
           if (!dogsRes.ok) throw new Error('Failed to fetch dogs');
           this.dogs = await dogsRes.json();
 
-          // 为每只狗获取随机照片
           const dogPhotoPromises = this.dogs.map(async dog => {
             try {
               const photoRes = await fetch('https://dog.ceo/api/breeds/image/random');
@@ -147,7 +138,7 @@
               const photoData = await photoRes.json();
               dog.imageUrl = photoData.message;
             } catch (error) {
-              dog.imageUrl = 'https://images.dog.ceo/breeds/maltese/n02085936_10044.jpg'; // 默认图片
+              dog.imageUrl = 'https://images.dog.ceo/breeds/maltese/n02085936_10044.jpg';
             }
           });
 
@@ -160,7 +151,7 @@
       }
     },
     mounted() {
-      this.loadDogs(); 
+      this.loadDogs();
     }
   }).mount('#app');
 </script>
