@@ -152,13 +152,12 @@
               await getCurrentUser();
             }
 
-            // 使用当前用户ID
             const walkerId = user.value.user_id;
 
             const res = await fetch(`/api/walks/${requestId}/apply`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ walker_id: walkerId }) // 使用当前用户ID
+              body: JSON.stringify({ walker_id: walkerId })
             });
 
             const result = await res.json();
@@ -174,7 +173,6 @@
           }
         }
 
-        // 加载遛狗请求
         async function loadWalkRequests() {
           try {
             const res = await fetch('/api/walks');
@@ -185,7 +183,6 @@
           }
         }
 
-        // 检查登录状态
         async function checkLogin() {
           try {
             const res = await fetch('/api/users/me');
@@ -195,13 +192,12 @@
             if (data.role !== 'walker') {
               window.location.href = '/';
             }
-            user.value = data; // 存储用户数据
+            user.value = data;
           } catch (error) {
             window.location.href = '/';
           }
         }
 
-        // 登出功能
         function logout() {
           fetch('/api/users/logout', {
             method: 'POST'
@@ -215,7 +211,7 @@
         }
 
         onMounted(() => {
-          checkLogin(); // 获取并存储当前用户信息
+          checkLogin();
           loadWalkRequests();
         });
 
