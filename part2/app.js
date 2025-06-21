@@ -42,8 +42,7 @@ app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
 });
-// 在现有路由之后添加狗狗路由
 const dogRoutes = require('./routes/dogRoutes');
 app.use('/api/dogs', dogRoutes);
-// Export the app instead of listening here
+
 module.exports = app;
