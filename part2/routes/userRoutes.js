@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models/db');
 
-// GET all users (for admin/testing)
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT user_id, username, email, role FROM Users');
@@ -12,7 +11,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST a new user (simple signup)
 router.post('/register', async (req, res) => {
   const { username, email, password, role } = req.body;
 
@@ -28,7 +26,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// 获取当前用户信息 (新增)
 router.get('/me', (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ error: 'Not logged in' });
