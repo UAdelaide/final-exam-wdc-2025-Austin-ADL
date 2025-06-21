@@ -167,7 +167,6 @@
     </div>
   </div>
 
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
   <script>
@@ -183,13 +182,12 @@
         });
 
         const walks = ref([]);
-        const dogs = ref([]); // 存储当前业主的狗列表
+        const dogs = ref([]);
         const user = ref(null);
         const message = ref('');
         const error = ref('');
         const loading = ref(false);
 
-        // 检查登录状态
         async function checkLogin() {
           try {
             const res = await fetch('/api/users/me');
@@ -205,7 +203,6 @@
           }
         }
 
-        // 加载当前业主的狗列表
         async function loadDogs() {
           try {
             const res = await fetch('/api/walks/dogs');
@@ -217,7 +214,6 @@
           }
         }
 
-        // 加载遛狗请求
         async function loadWalks() {
           loading.value = true;
           try {
@@ -233,7 +229,6 @@
           }
         }
 
-        // 提交遛狗请求
         async function submitWalkRequest() {
           try {
             const res = await fetch('/api/walks', {
@@ -248,7 +243,6 @@
             message.value = result.message || 'Walk request created successfully!';
             error.value = '';
 
-            // 重置表单
             form.value = {
               dog_id: '',
               requested_time: '',
@@ -256,7 +250,6 @@
               location: ''
             };
 
-            // 重新加载遛狗请求
             loadWalks();
           } catch (err) {
             error.value = err.message || 'Failed to create walk request';
@@ -264,7 +257,6 @@
           }
         }
 
-        // 登出功能
         function logout() {
           fetch('/api/users/logout', {
             method: 'POST'
@@ -277,7 +269,6 @@
           });
         }
 
-        // 初始化
         onMounted(() => {
           checkLogin();
           loadDogs();
