@@ -19,7 +19,6 @@
 </head>
 <body class="bg-light">
 
-  <!-- 登录表单 (新增) -->
   <div class="login-container mb-5">
     <h2 class="text-center mb-4">Welcome to the Dog Walking Service!</h2>
 
@@ -36,10 +35,8 @@
     </form>
   </div>
 
-  <!-- 登录状态消息容器 (新增) -->
   <div id="loginMessage" class="alert alert-danger d-none mx-auto" style="max-width: 400px;"></div>
 
-  <!-- Vue app 容器 (修改) -->
   <div id="app" class="container py-5" v-if="loggedIn">
     <h1 class="mb-4 text-primary">{{ message }}</h1>
     <p class="lead">Connect with trusted walkers for your beloved dog!</p>
@@ -55,7 +52,7 @@
       data() {
         return {
           message: 'Welcome to the Dog Walking Service!',
-          loggedIn: false // 添加登录状态
+          loggedIn: false
         };
       }
     }).mount('#app');

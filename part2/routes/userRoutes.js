@@ -36,7 +36,6 @@ router.get('/me', (req, res) => {
   res.json(req.session.user);
 });
 
-// POST 登录 (修改)
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -53,12 +52,10 @@ router.post('/login', async (req, res) => {
 
     const user = rows[0];
 
-    // 直接比较明文密码 (根据要求)
     if (password !== user.password_hash) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // 设置 session
     req.session.user = {
       user_id: user.user_id,
       username: user.username,
@@ -74,7 +71,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST 注销 (新增)
 router.post('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
